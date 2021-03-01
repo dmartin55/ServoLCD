@@ -1,0 +1,64 @@
+#include <Arduino.h>
+#include <LiquidCrystal.h>
+#include <servo.h>
+
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+Servo servo_test;
+
+int angle = 0;
+
+void Servoangle(int angle)
+{
+  lcd.setCursor(0, 1);
+  lcd.print(angle);
+  lcd.print(" ");
+}
+
+
+void setup() {
+  lcd.begin(16,2);
+  servo_test.attach(7);
+
+Serial.begin(9600);
+Serial.println("ARos is loading...");
+delay(1000);
+Serial.println("ARos loaded succesfully");
+Serial.println("Calibrating servo...");
+for (angle = 0; angle <=180; angle +=1)
+servo_test.write(0);
+delay(1000);
+servo_test.write(180);
+delay(1000);
+servo_test.write(90);
+delay(1000);
+Serial.println("Cal Done") ;
+
+
+}
+
+void loop()
+{
+  for(angle = 0; angle <= 180; angle +=1)
+  if(Serial.available())
+  {
+    int state = Serial.parseInt();
+
+    if (state <= 10)
+    {
+      Serial.print(">");
+      Serial.println(state);
+      Serial.println("Number to low");
+    }
+
+    if(state >= 10 && state <170)
+    {
+      Serial.print(">");
+      Serial.println(state);
+      Serial.print("Turning servo to ");
+      Serial.print(state);
+      Serial.println(" degrees");
+      servo_test.write(state);
+    }
+  }
+
+}
